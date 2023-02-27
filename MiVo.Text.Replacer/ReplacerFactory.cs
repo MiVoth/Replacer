@@ -4,8 +4,12 @@ namespace MiVo.Text.Replacer
 {
     public static class ReplacerFactory
     {
-        public static IReplacer GetReplacer(string input, ReplacerConfig config)
+        public static IReplacer GetReplacer(string input, ReplacerConfig? config = null)
         {
+            if (config == null)
+            {
+                config = new();
+            }
             IReplacer replacer = new Replacer(input)
             {
                 ReplacePattern = config.ReplacePattern,
