@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using System.Text;
 using HtmlAgilityPack;
 using MiVo.Text.Replacer.Entities;
@@ -18,22 +17,28 @@ namespace MiVo.Text.Replacer
         public string ReplaceDataName { get; set; } = "data-replace";
         public string ShowDataName { get; set; } = "data-show"; //"data-remove";
         public string HideDataName { get; set; } = "data-hide"; //"data-remove";
+        public bool TypeReflectorWithPrefix { get; set; } = false;
     }
 
     class Replacer : IReplacer
     {
         private bool Blue { get; set; } = false;
         private readonly string _input;
-        public string ReplacePattern { get; set; } = "[*{0}*]";
-        public string RemovePatternStart { get; set; } = "[?{0}?]";
-        public string RemovePatternEnd { get; set; } = "[?/{0}?]";
+        public string ReplacePattern { get => Config.ReplacePattern; }
+        public string RemovePatternStart { get => Config.RemovePatternStart; }
+        public string RemovePatternEnd { get => Config.RemovePatternEnd; }
+        public string ReplaceDataName { get => Config.ReplaceDataName; }
+        public string ShowDataName { get => Config.ShowDataName; }
+        public string HideDataName { get => Config.HideDataName; }
 
         public List<Exception> Errors { get; set; }
+        public ReplacerConfig Config { get; }
 
-        public Replacer(string input)
+        public Replacer(string input, ReplacerConfig config)
         {
             _input = input;
             Errors = new();
+            Config = config;
         }
 
         /// <summary>
@@ -55,7 +60,7 @@ namespace MiVo.Text.Replacer
         {
             if (obj != null && t != null)
             {
-                TypeReflector.Reflector(obj, t, this);
+                TypeReflector.Reflector(obj, t, this, Config.TypeReflectorWithPrefix, null);
             }
             string txt = _input;
             txt = SimpleTextReplaceAndRemove(txt);
@@ -186,9 +191,7 @@ namespace MiVo.Text.Replacer
             }
             return result;
         }
-        public string ReplaceDataName { get; set; } = "data-replace";
-        public string ShowDataName { get; set; } = "data-show"; //"data-remove";
-        public string HideDataName { get; set; } = "data-hide"; //"data-remove";
+
 
         // uses Agility-Package so look for data-attributes with the key-names
         private string AgilityReplaceAndRemove(string txt)
@@ -223,7 +226,7 @@ namespace MiVo.Text.Replacer
                                     {
                                         HtmlNode clone = node.CloneNode(true);
                                         string r = clone.InnerHtml;
-                                        Replacer rpl = new(r);
+                                        Replacer rpl = new(r, Config);
                                         Type itemType = item.GetType();
                                         clone.InnerHtml = rpl.GetText(item, itemType);
                                         node.ParentNode.InsertBefore(clone, node);

@@ -10,15 +10,15 @@ namespace MiVo.Text.Replacer
             {
                 config = new();
             }
-            IReplacer replacer = new Replacer(input)
-            {
-                ReplacePattern = config.ReplacePattern,
-                RemovePatternStart = config.RemovePatternStart,
-                RemovePatternEnd = config.RemovePatternEnd,
-                ReplaceDataName = config.ReplaceDataName,
-                ShowDataName = config.ShowDataName,
-                HideDataName = config.HideDataName
-            };
+            IReplacer replacer = new Replacer(input, config);
+            // {
+            //     ReplacePattern = config.ReplacePattern,
+            //     RemovePatternStart = config.RemovePatternStart,
+            //     RemovePatternEnd = config.RemovePatternEnd,
+            //     ReplaceDataName = config.ReplaceDataName,
+            //     ShowDataName = config.ShowDataName,
+            //     HideDataName = config.HideDataName
+            // };
             return replacer;
         }
     }

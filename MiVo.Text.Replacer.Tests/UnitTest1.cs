@@ -53,7 +53,40 @@ public class UnitTest1
             AddSomething = "something to add",
             WithRegards = false
         });
+        Assert.Equal(output.Contains("something to"), true);
+    }
+
+        [Fact]
+    public void ReplaceStyleTest()
+    {
+        string input = @"
+        <html> 
+  <head><style data-replace=""style""></style></head>
+  <body> 
+    <h1 data-replace=""Title""></h1>
+    <hr />
+    <p>
+      Start of the text, <br>
+      but i want to add [*AddSomething*]
+    </p>
+    <hr />
+    <div data-remove=""WithRegards"">
+      With regards
+    </div>
+  </body>
+</html>
+";
+        IReplacer replacer = ReplacerFactory.GetReplacer(input);
+
+        string output = replacer.GetText(new
+        {
+            Title = "My Title",
+            AddSomething = "something to add",
+            WithRegards = false,
+            style = "body: color:black;"
+        });
         System.IO.File.WriteAllText(@"C:\workspace\rplx.html", output);
         Assert.Equal(output.Contains("something to"), true);
+        Assert.Equal(output.Contains("body: color:black;"), true);
     }
 }

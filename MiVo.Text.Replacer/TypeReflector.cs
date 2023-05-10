@@ -46,11 +46,16 @@ namespace MiVo.Text.Replacer
             return type.GetProperties(BindingFlags.FlattenHierarchy
                 | BindingFlags.Public | BindingFlags.Instance);
         }
-        public static void Reflector(object bndl, Type t, Replacer rpl)
+        public static void Reflector(object bndl, Type t, Replacer rpl, bool withPrefix = false, string? nameBefore = null)
         {
             var bndlprops = t.GetPublicProperties();
             foreach (var prop in bndlprops)
             {
+                string propName = prop.Name;
+                if (withPrefix && !string.IsNullOrEmpty(nameBefore))
+                {
+                    propName = $"{nameBefore}_{prop.Name}";
+                }
                 if (prop.PropertyType == typeof(string)
                     || prop.PropertyType == typeof(long)
                     || prop.PropertyType == typeof(long?)
@@ -66,8 +71,8 @@ namespace MiVo.Text.Replacer
                     {
                         sval = $"{prop.GetValue(bndl)}";
                     }
-                    rpl.AddStringReplacement(prop.Name, sval);
-                    rpl.AddRemoveRelation(prop.Name, !string.IsNullOrEmpty(sval));
+                    rpl.AddStringReplacement(propName, sval);
+                    rpl.AddRemoveRelation(propName, !string.IsNullOrEmpty(sval));
                 }
                 else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
                 {
@@ -80,7 +85,7 @@ namespace MiVo.Text.Replacer
                             sval = (bool)val;
                         }
                     }
-                    rpl.AddRemoveRelation(prop.Name, sval);
+                    rpl.AddRemoveRelation(propName, sval);
                 }
                 else if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
                 {
@@ -103,30 +108,68 @@ namespace MiVo.Text.Replacer
                     }
                     if (prop.PropertyType == typeof(DateTime?))
                     {
-                        rpl.AddRemoveRelation(prop.Name, !string.IsNullOrEmpty(sval));
+                        rpl.AddRemoveRelation(propName, !string.IsNullOrEmpty(sval));
                     }
-                    rpl.AddStringReplacement(prop.Name, sval);
+                    rpl.AddStringReplacement(propName, sval);
                 }
                 else if (prop.PropertyType.IsInterface || prop.PropertyType.IsClass)
                 {
-                    if (bndl != null)
+                    // if (bndl != null)
+                    // {
+                    //     object? obj2 = prop.GetValue(bndl);
+                    //     if (obj2 != null)
+                    //     {
+                    //         if (prop.PropertyType.IsGenericType &&
+                    //         (prop.PropertyType.GetGenericTypeDefinition() == typeof(List<>) ||
+                    //         prop.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+                    //         {
+                    //             rpl.ReplacementRelation.Add(propName, new Replacement
+                    //             {
+                    //                 Type = ReplacementType.Template,
+                    //                 Value = obj2
+                    //             });
+                    //         }
+                    //         else
+                    //         {
+                    //             Reflector(obj2, prop.PropertyType, rpl, withPrefix, propName);
+                    //         }
+                    //     }
+                    // }
+                    if (prop.PropertyType.IsGenericType &&
+                    (prop.PropertyType.GetGenericTypeDefinition() == typeof(List<>) ||
+                    prop.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
                     {
-                        object? obj2 = prop.GetValue(bndl);
-                        if (obj2 != null)
+                        object? val = bndl == null ? null : prop.GetValue(bndl);
+                        if (val != null)
                         {
-                            if (prop.PropertyType.IsGenericType &&
-                            (prop.PropertyType.GetGenericTypeDefinition() == typeof(List<>) ||
-                            prop.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+                            object? obj2 = prop.GetValue(bndl);
+                            if (obj2 != null)
                             {
-                                rpl.ReplacementRelation.Add(prop.Name, new Replacement
+                                rpl.ReplacementRelation.Add(propName, new Replacement
                                 {
                                     Type = ReplacementType.Template,
                                     Value = obj2
                                 });
                             }
-                            else
+                        }
+                    }
+                    else
+                    {
+                        if (bndl != null)
+                        {
+                            if (propName.StartsWith("_"))
                             {
-                                Reflector(obj2, prop.PropertyType, rpl);
+                                propName = string.Empty;
+                            }
+                            object? objValue = prop.GetValue(bndl);
+                            if (withPrefix && string.IsNullOrEmpty(propName))
+                            {
+                                rpl.RemoveRelation.Add(propName, objValue != null);
+
+                            }
+                            if (objValue != null)
+                            {
+                                Reflector(objValue, prop.PropertyType, rpl, withPrefix, propName);
                             }
                         }
                     }
