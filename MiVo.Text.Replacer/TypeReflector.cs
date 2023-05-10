@@ -164,8 +164,7 @@ namespace MiVo.Text.Replacer
                             object? objValue = prop.GetValue(bndl);
                             if (withPrefix && !string.IsNullOrEmpty(propName))
                             {
-                                rpl.RemoveRelation.Add(propName, objValue != null);
-
+                                rpl.AddRemoveRelation(propName, objValue != null);
                             }
                             if (objValue != null)
                             {
@@ -173,12 +172,12 @@ namespace MiVo.Text.Replacer
                             }
                             else if (!string.IsNullOrEmpty(propName))
                             {
-                                rpl.RemoveRelation.Add(propName, false);
+                                rpl.AddRemoveRelation(propName, false);
                             }
                         }
                         else
                         {
-                            rpl.RemoveRelation.Add(propName, false);
+                            rpl.AddRemoveRelation(propName, false);
                         }
                     }
                 }

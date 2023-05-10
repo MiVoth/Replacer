@@ -110,6 +110,14 @@ namespace MiVo.Text.Replacer
             return txt;
         }
 
+        public void AddObject<T>(T obj)
+        {
+            if (obj != null)
+            {
+                TypeReflector.Reflector(obj, typeof(T), this, Config.TypeReflectorWithPrefix, null);
+            }
+        }
+
         private string SimpleTextReplaceAndRemove(string txt)
         {
             StringBuilder sb = new StringBuilder(_input);

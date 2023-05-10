@@ -6,6 +6,7 @@ namespace MiVo.Text.Replacer.Interfaces
     {
         string GetText<T>(T obj);
         string GetText(object? obj = null, Type? t = null);
+        void AddObject<T>(T obj);
         void AddString(string pattern, string replacement);
         void AddStringReplacement(string key, string replacement);
         void AddImageReplacement(string key, string replacement);
