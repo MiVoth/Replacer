@@ -41,6 +41,31 @@ namespace MiVo.Text.Replacer
             Config = config;
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            foreach (var replace in ReplacementRelation)
+            {
+                sb.AppendLine($"{replace.Key}: '{replace.Value}'");
+            }
+            sb.AppendLine("##############################################");
+            sb.AppendLine("Remove Relations:");
+            sb.AppendLine("-----------------");
+            foreach (var remove in RemoveRelation)
+            {
+                sb.AppendLine($"{remove.Key}: '{remove.Value}'");
+            }
+            sb.AppendLine("##############################################");
+            sb.AppendLine($"ReplacePattern: {Config.ReplacePattern}");
+            sb.AppendLine($"RemovePattern: {Config.RemovePatternStart} - {Config.RemovePatternEnd}");
+            sb.AppendLine($"ReplaceDataName: {Config.ReplaceDataName}");
+            sb.AppendLine($"ShowDataName: {Config.ShowDataName}");
+            sb.AppendLine($"HideDataName: {Config.HideDataName}");
+            sb.AppendLine($"TypeReflectorWithPrefix: {Config.TypeReflectorWithPrefix}");
+            return sb.ToString();
+            // return base.ToString();
+        }
+
         /// <summary>
         /// 
         /// </summary>
