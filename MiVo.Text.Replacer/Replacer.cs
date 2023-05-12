@@ -9,17 +9,6 @@ using MiVo.Text.Replacer.Interfaces;
 
 namespace MiVo.Text.Replacer
 {
-    public class ReplacerConfig
-    {
-        public string ReplacePattern { get; set; } = "[*{0}*]";
-        public string RemovePatternStart { get; set; } = "[?{0}?]";
-        public string RemovePatternEnd { get; set; } = "[?/{0}?]";
-        public string ReplaceDataName { get; set; } = "data-replace";
-        public string ShowDataName { get; set; } = "data-show"; //"data-remove";
-        public string HideDataName { get; set; } = "data-hide"; //"data-remove";
-        public bool TypeReflectorWithPrefix { get; set; } = false;
-    }
-
     class Replacer : IReplacer
     {
         private bool Blue { get; set; } = false;
@@ -56,12 +45,7 @@ namespace MiVo.Text.Replacer
                 sb.AppendLine($"{remove.Key}: '{remove.Value}'");
             }
             sb.AppendLine("##############################################");
-            sb.AppendLine($"ReplacePattern: {Config.ReplacePattern}");
-            sb.AppendLine($"RemovePattern: {Config.RemovePatternStart} - {Config.RemovePatternEnd}");
-            sb.AppendLine($"ReplaceDataName: {Config.ReplaceDataName}");
-            sb.AppendLine($"ShowDataName: {Config.ShowDataName}");
-            sb.AppendLine($"HideDataName: {Config.HideDataName}");
-            sb.AppendLine($"TypeReflectorWithPrefix: {Config.TypeReflectorWithPrefix}");
+            sb.AppendLine($"ReplacerConfig: {Config}");
             return sb.ToString();
             // return base.ToString();
         }
@@ -85,7 +69,7 @@ namespace MiVo.Text.Replacer
         {
             if (obj != null && t != null)
             {
-                TypeReflector.Reflector(obj, t, this, Config.TypeReflectorWithPrefix, null);
+                TypeReflector.Reflector(obj, t, this, Config.TypeReflectorConfig, null);
             }
             string txt = _input;
             txt = SimpleTextReplaceAndRemove(txt);
@@ -114,7 +98,7 @@ namespace MiVo.Text.Replacer
         {
             if (obj != null)
             {
-                TypeReflector.Reflector(obj, typeof(T), this, Config.TypeReflectorWithPrefix, null);
+                TypeReflector.Reflector(obj, typeof(T), this, Config.TypeReflectorConfig, null);
             }
         }
 

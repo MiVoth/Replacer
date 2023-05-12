@@ -46,13 +46,13 @@ namespace MiVo.Text.Replacer
             return type.GetProperties(BindingFlags.FlattenHierarchy
                 | BindingFlags.Public | BindingFlags.Instance);
         }
-        public static void Reflector(object bndl, Type t, Replacer rpl, bool withPrefix = false, string? nameBefore = null)
+        public static void Reflector(object bndl, Type t, Replacer rpl, TypeReflectorConfig config, string? nameBefore = null)
         {
             var bndlprops = t.GetPublicProperties();
             foreach (var prop in bndlprops)
             {
                 string propName = prop.Name;
-                if (withPrefix && !string.IsNullOrEmpty(nameBefore))
+                if (config.WithPrefix && !string.IsNullOrEmpty(nameBefore))
                 {
                     propName = $"{nameBefore}_{prop.Name}";
                 }
@@ -83,6 +83,17 @@ namespace MiVo.Text.Replacer
                         if (val != null)
                         {
                             sval = (bool)val;
+                        }
+                        if (config.AutoInsertBooleanText)
+                        {
+                            if (sval)
+                            {
+                                rpl.AddStringReplacement(propName, config.AutoBooleanTextTrue);
+                            }
+                            else
+                            {
+                                rpl.AddStringReplacement(propName, config.AutoBooleanTextFalse);
+                            }
                         }
                     }
                     rpl.AddRemoveRelation(propName, sval);
@@ -162,13 +173,13 @@ namespace MiVo.Text.Replacer
                                 propName = string.Empty;
                             }
                             object? objValue = prop.GetValue(bndl);
-                            if (withPrefix && !string.IsNullOrEmpty(propName))
+                            if (config.WithPrefix && !string.IsNullOrEmpty(propName))
                             {
                                 rpl.AddRemoveRelation(propName, objValue != null);
                             }
                             if (objValue != null)
                             {
-                                Reflector(objValue, prop.PropertyType, rpl, withPrefix, propName);
+                                Reflector(objValue, prop.PropertyType, rpl, config, propName);
                             }
                             else if (!string.IsNullOrEmpty(propName))
                             {
