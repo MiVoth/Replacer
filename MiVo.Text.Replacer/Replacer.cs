@@ -254,15 +254,17 @@ namespace MiVo.Text.Replacer
                                 {
                                     IEnumerable liste = (IEnumerable)ReplacementRelation[key].Value;
                                     StringBuilder sb = new("");
-
+                                    int i = 1;
                                     foreach (object item in liste)
                                     {
                                         HtmlNode clone = node.CloneNode(true);
                                         string r = clone.InnerHtml;
                                         Replacer rpl = new(r, Config);
                                         Type itemType = item.GetType();
+                                        rpl.AddStringReplacement("Index", i.ToString());
                                         clone.InnerHtml = rpl.GetText(item, itemType);
                                         node.ParentNode.InsertBefore(clone, node);
+                                        i++;
                                     }
                                     node.Remove();
                                 }
