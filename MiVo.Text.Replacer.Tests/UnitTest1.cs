@@ -1,34 +1,33 @@
 using MiVo.Text.Replacer.Interfaces;
 
 namespace MiVo.Text.Replacer.Tests;
-
 public class UnitTest1
 {
-    [Fact]
-    public void Test1()
-    {
-        Assert.Equal(MiVo.Text.Replacer.BasicClass.TestIt(), true);
-    }
+  [Fact]
+  public void Test1()
+  {
+    Assert.Equal(true, MiVo.Text.Replacer.BasicClass.TestIt());
+  }
 
-    [Fact]
-    public void Test2()
+  [Fact]
+  public void Test2()
+  {
+    string input = "<div>Hello</div><div data-replace=\"hello\"></div>";
+    IReplacer replacer = ReplacerFactory.GetReplacer(input, new ReplacerConfig
     {
-        string input = "<div>Hello</div><div data-replace=\"hello\"></div>";
-        IReplacer replacer = ReplacerFactory.GetReplacer(input, new ReplacerConfig
-        {
-        });
+    });
 
-        string output = replacer.GetText(new
-        {
-            hello = "world"
-        });
-        Assert.Equal(output.Contains("world"), true);
-    }
-
-    [Fact]
-    public void ExampleTest2()
+    string output = replacer.GetText(new
     {
-        string input = @"
+      hello = "world"
+    });
+    Assert.Equal(true, output.Contains("world"));
+  }
+
+  [Fact]
+  public void ExampleTest2()
+  {
+    string input = @"
         <html> 
   <head></head>
   <body> 
@@ -45,21 +44,21 @@ public class UnitTest1
   </body>
 </html>
 ";
-        IReplacer replacer = ReplacerFactory.GetReplacer(input);
+    IReplacer replacer = ReplacerFactory.GetReplacer(input);
 
-        string output = replacer.GetText(new
-        {
-            Title = "My Title",
-            AddSomething = "something to add",
-            WithRegards = false
-        });
-        Assert.Equal(output.Contains("something to"), true);
-    }
-
-        [Fact]
-    public void ReplaceStyleTest()
+    string output = replacer.GetText(new
     {
-        string input = @"
+      Title = "My Title",
+      AddSomething = "something to add",
+      WithRegards = false
+    });
+    Assert.Equal(true, output.Contains("something to"));
+  }
+
+  [Fact]
+  public void ReplaceStyleTest()
+  {
+    string input = @"
         <html> 
   <head><style data-replace=""style""></style></head>
   <body> 
@@ -76,17 +75,17 @@ public class UnitTest1
   </body>
 </html>
 ";
-        IReplacer replacer = ReplacerFactory.GetReplacer(input);
+    IReplacer replacer = ReplacerFactory.GetReplacer(input);
 
-        string output = replacer.GetText(new
-        {
-            Title = "My Title",
-            AddSomething = "something to add",
-            WithRegards = false,
-            style = "body: color:black;"
-        });
-        System.IO.File.WriteAllText(@"C:\workspace\rplx.html", output);
-        Assert.Equal(output.Contains("something to"), true);
-        Assert.Equal(output.Contains("body: color:black;"), true);
-    }
+    string output = replacer.GetText(new
+    {
+      Title = "My Title",
+      AddSomething = "something to add",
+      WithRegards = false,
+      style = "body: color:black;"
+    });
+    System.IO.File.WriteAllText(@"C:\workspace\rplx.html", output);
+    Assert.Equal(true, output.Contains("something to"));
+    Assert.Equal(true, output.Contains("body: color:black;"));
+  }
 }

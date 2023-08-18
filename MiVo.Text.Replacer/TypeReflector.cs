@@ -46,9 +46,62 @@ namespace MiVo.Text.Replacer
             return type.GetProperties(BindingFlags.FlattenHierarchy
                 | BindingFlags.Public | BindingFlags.Instance);
         }
+
+
+        // propertyInfo.GetValue(bndl) as Enum
+        static string GetEnumDisplayName(Enum? value)
+        {
+            string result = "";
+            if (value == null)
+            {
+                return "";
+            }
+            FieldInfo field = value.GetType().GetField(value.ToString());
+
+            if (field != null)
+            {
+                Attribute attribute = field.GetCustomAttributes().Where(f => f.GetType().Name == "DisplayAttribute").FirstOrDefault();
+                if (attribute != null)
+                {
+                    PropertyInfo[] attributeProperties = attribute.GetType().GetPublicProperties();
+                    PropertyInfo nameProperty = attributeProperties.FirstOrDefault(f => f.Name == "Name");
+                    if (nameProperty != null)
+                    {
+                        result = $"{nameProperty.GetValue(attribute)}";
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(result))
+            {
+                result = $"{value}";
+            }
+            return result;
+        }
+        // public static string GetNameOrValue(PropertyInfo propertyInfo, object? bndl)
+        // {
+        //     // propertyInfo.GetCustomAttributes().Where(f => f != null).First().
+        //     foreach (var attr in propertyInfo.GetCustomAttributes())
+        //     {
+        //         string n = attr.GetType().Name;
+        //     }
+        //     // propertyInfo.GetCustomAttribute<DisplayAttribute>();
+
+        //     // if (displayAttribute != null)
+        //     // {
+        //     //     return displayAttribute.Name;
+        //     // }
+        //     string sval = "";
+        //     if (bndl != null)
+        //     {
+        //         sval = $"{propertyInfo.GetValue(bndl)}";
+        //     }
+
+        //     return sval;
+        // }
+
         public static void Reflector(object bndl, Type t, Replacer rpl, TypeReflectorConfig config, string? nameBefore = null)
         {
-            var bndlprops = t.GetPublicProperties();
+            PropertyInfo[] bndlprops = t.GetPublicProperties();
             foreach (var prop in bndlprops)
             {
                 string propName = prop.Name;
@@ -73,6 +126,16 @@ namespace MiVo.Text.Replacer
                     }
                     rpl.AddStringReplacement(propName, sval);
                     rpl.AddRemoveRelation(propName, !string.IsNullOrEmpty(sval));
+                }
+                else if (prop.PropertyType.IsEnum)
+                {
+                    // string sval = GetNameOrValue(prop, bndl); // "";
+                    string sval = GetEnumDisplayName(prop.GetValue(bndl) as Enum); // "";
+                    // if (bndl != null)
+                    // {
+                    //     sval = $"{prop.GetValue(bndl)}";
+                    // }
+                    rpl.AddStringReplacement(propName, sval);
                 }
                 else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
                 {
