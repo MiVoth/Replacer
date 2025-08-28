@@ -1,12 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using MiVo.Text.Replacer.Interfaces;
 
 namespace MiVo.Text.Replacer.Tests;
+
 public class UnitTest1
 {
   [Fact]
   public void Test1()
   {
-    Assert.Equal(true, MiVo.Text.Replacer.BasicClass.TestIt());
+    Assert.True(MiVo.Text.Replacer.BasicClass.TestIt());
   }
 
   [Fact]
@@ -21,7 +25,7 @@ public class UnitTest1
     {
       hello = "world"
     });
-    Assert.Equal(true, output.Contains("world"));
+    Assert.Contains("world", output);
   }
 
   [Fact]
@@ -52,7 +56,7 @@ public class UnitTest1
       AddSomething = "something to add",
       WithRegards = false
     });
-    Assert.Equal(true, output.Contains("something to"));
+    Assert.Contains("something to", output);
   }
 
   [Fact]
@@ -85,7 +89,40 @@ public class UnitTest1
       style = "body: color:black;"
     });
     System.IO.File.WriteAllText(@"C:\workspace\rplx.html", output);
-    Assert.Equal(true, output.Contains("something to"));
-    Assert.Equal(true, output.Contains("body: color:black;"));
+    Assert.Contains("something to", output);
+    Assert.Contains("body: color:black;", output);
+  }
+
+  [Fact]
+  public void TestList()
+  {
+    string input = "<html><body><p data-replace=\"List\"><span data-replace=\"AddSomething\"></span></p></body></html>";
+    IReplacer replacer = ReplacerFactory.GetReplacer(input);
+    List<PocoClass> list = new List<PocoClass>
+    {
+      new PocoClass { Title = "Title 1", AddSomething = "Add 1", WithRegards = true, Style = "color:red;" },
+      new PocoClass { Title = "Title 2", AddSomething = "Add 2", WithRegards = false, Style = "color:blue;" }
+    };
+    List<PocoClass> emptyList = [];
+    string output = replacer.GetText(new
+    {
+      List = list,
+      List2 = emptyList.AsEnumerable()
+    });
+    // string text = "this ist text";
+    string output2 = replacer.GetText(new
+    {
+      Poco1 = new PocoClass()
+      {
+        ExampleList = ["One", "Two"]
+      },
+      Poco2 = new PocoClass2
+      { 
+        ExampleList = ["Three", "Four"]
+      }
+    });
+    Assert.Contains("Add 1", output);
+    Assert.Contains("Add 2", output);
+    Assert.Contains("List", output2);
   }
 }

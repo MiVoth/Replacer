@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -219,11 +220,30 @@ namespace MiVo.Text.Replacer
                             object? obj2 = prop.GetValue(bndl);
                             if (obj2 != null)
                             {
-                                rpl.ReplacementRelation.Add(propName, new Replacement
+                                bool isEmpty = false;
+                                if (obj2 is IList objEnumerable)
                                 {
-                                    Type = ReplacementType.Template,
-                                    Value = obj2
-                                });
+                                    isEmpty = objEnumerable.Count == 0;
+                                }
+                                if (!isEmpty)
+                                {
+                                    if (rpl.ReplacementRelation.ContainsKey(propName))
+                                    {
+                                        rpl.ReplacementRelation[propName] = new Replacement
+                                        {
+                                            Type = ReplacementType.Template,
+                                            Value = obj2
+                                        };
+                                    }
+                                    else
+                                    {
+                                        rpl.ReplacementRelation.Add(propName, new Replacement
+                                        {
+                                            Type = ReplacementType.Template,
+                                            Value = obj2
+                                        });
+                                    }
+                                }
                             }
                         }
                     }
